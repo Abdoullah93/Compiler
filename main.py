@@ -1,5 +1,14 @@
 from lexicalAnalysis import Lexer
 
-txt = "int a = 5;"
-lex = Lexer(txt)
+file_path = "test.c"
+
+with open(file_path, 'r') as file:
+	file_content = file.read()
+
+lex = Lexer(file_content)
 print(lex.text)
+
+token = lex.get_next_token()
+while token.type != "EOF":
+	print(token)
+	token = lex.get_next_token()
