@@ -10,6 +10,9 @@ class Token:
         return f'Token({self.type}, {self.value}, {self.line})'
 
 class Lexer:
+    """
+    regarde uniquement le token
+    """
     def __init__(self, text):
         self.text = text
         self.pos = 0
