@@ -1,14 +1,17 @@
-from lexicalAnalysis import Lexer
+from Lexer import Lexer
 
 file_path = "test.c"
+
 
 with open(file_path, 'r') as file:
 	file_content = file.read()
 
 lex = Lexer(file_content)
-print(lex.text)
 
-token = lex.get_next_token()
-while token.type != "EOF":
-	print(token)
-	token = lex.get_next_token()
+lex.walk_through_words()
+tokens = lex.tokens
+
+## TESTS
+for token in lex.tokens: 
+    print('Token: '+token.value+', Type: '+token.type)
+
