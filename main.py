@@ -1,5 +1,14 @@
-from lexicalAnalysis import Lexer
+from Lexer import Lexer
 
-txt = "int a = 5;"
-lex = Lexer(txt)
-print(lex.text)
+file_path = "C:/Users/user/Desktop/compiler/Compiler/test.c"
+
+with open(file_path, 'r') as file:
+	file_content = file.read()
+
+lex = Lexer(file_content)
+lex.walk_through_words()
+tokens = lex.tokens
+
+## TESTS
+for token in lex.tokens: 
+    print('Token: '+token.value+', Type: '+token.type)
