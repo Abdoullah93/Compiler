@@ -10,7 +10,7 @@ int main() {
     /*
     another comment block
     */
-    
+    printf(y!=1);
     printf("Hello, world!\n");
     return 0;
 }

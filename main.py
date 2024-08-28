@@ -9,9 +9,9 @@ with open(file_path, 'r') as file:
 lex = Lexer(file_content)
 
 lex.walk_through_words()
-tokens = lex.tokens
 
 ## TESTS
-for token in lex.tokens: 
-    print('Token: '+token.value+', Type: '+token.type)
+for tok in lex.tokens:
+	print(tok)
 
+# TODO: correct line in token
