@@ -2,7 +2,8 @@ class Lexer:
     def __init__(self, code):
         self.code = code
         self.current_position = 0
-        self.keywords = {"int", "return", "if", "else", "while", "for", "void", "char", "float", "double","continu","break","send","recv","debug"}  # C keywords
+        self.current_line = 1  # Track the current line number
+        self.keywords = {"int", "return", "if", "else", "while", "for", "void", "char", "float", "double", "continue", "break", "send", "recv", "debug"}  # C keywords
         self.tokens = []
 
     class Token:
@@ -14,6 +15,8 @@ class Lexer:
     def walk_through_words(self):
         while self.current_position < len(self.code):
             while self.current_position < len(self.code) and self.code[self.current_position].isspace():
+                if self.code[self.current_position] == '\n':  # Track line breaks
+                    self.current_line += 1
                 self.current_position += 1
             
             if self.current_position >= len(self.code):
@@ -39,9 +42,11 @@ class Lexer:
             self.current_position += 1
             while self.current_position < len(self.code) and self.code[self.current_position] != '"':
                 token_string += self.code[self.current_position]
+                if self.code[self.current_position] == '\n':  # Track line breaks in string literals
+                    self.current_line += 1
                 self.current_position += 1
             if self.current_position < len(self.code):
-                token_string += self.code[self.current_position]
+                token_string += self.code[self.current_position]  # Fixed typo
                 self.current_position += 1
             return token_string
 
@@ -51,6 +56,8 @@ class Lexer:
             self.current_position += 1
             while self.current_position < len(self.code) and self.code[self.current_position] != "'":
                 token_string += self.code[self.current_position]
+                if self.code[self.current_position] == '\n':  # Track line breaks in character literals
+                    self.current_line += 1
                 self.current_position += 1
             if self.current_position < len(self.code):
                 token_string += self.code[self.current_position]
@@ -66,6 +73,8 @@ class Lexer:
             elif self.current_position + 1 < len(self.code) and self.code[self.current_position + 1] == '*':
                 self.current_position += 2
                 while self.current_position + 1 < len(self.code) and (self.code[self.current_position] != '*' or self.code[self.current_position + 1] != '/'):
+                    if self.code[self.current_position] == '\n':  # Track line breaks in block comments
+                        self.current_line += 1
                     self.current_position += 1
                 self.current_position += 2  # Skip the '*/'
                 return ''  # Skip the comment
@@ -89,6 +98,8 @@ class Lexer:
                     break
 
             if current_char.isspace() or current_char in "{}[]();,+-*/%&|^~!=<>":
+                if current_char == '\n':  # Track line breaks
+                    self.current_line += 1
                 if token_string:
                     break
                 else:
@@ -102,7 +113,7 @@ class Lexer:
 
     def tokenize_word(self, word):
         token_type = self.check_token(word)
-        currentToken = self.Token(token_type, self.current_position, word)
+        currentToken = self.Token(token_type, self.current_line, word)  # Use current_line instead of current_position
         self.tokens.append(currentToken)
 
     def check_token(self, word):
@@ -143,21 +154,25 @@ class Lexer:
 
 
 # # # TESTING
-# code = """
-# #include <stdio.h>
+code = """
+#include <stdio.h>
 
-# int main() { 
-#     // this is a comment
-#     int x1 = 1;
-#     int y = 1;
-#     if (x1 == 1 && y == 1) {
-#         int z = x1 + y;
-#     }
-#     printf("Hello, world!\n");
-#     return 0;
-# }
-# """
-# lexer = Lexer(code)
-# lexer.walk_through_words()
-# for token in lexer.tokens: 
-#     print('Token: ' + token.value + ', Type: ' + token.type)
+int main() { 
+    // this is a comment
+    int x1 = 1;
+    int y = 1;
+    if (x1 == 1 && y == 1) {
+        int z = x1 + y;
+    }
+    printf("Hello, world!\n");
+    return 0;
+}
+"""
+lexer = Lexer(code)
+lexer.walk_through_words()
+for token in lexer.tokens: 
+    print('Token: ' + token.value + ', Type: ' + token.type + ', Line: ' + str(token.line))
+
+
+## L=lastToken T=currentToken i= currentPosition  
+## Class TokenType
