@@ -1,3 +1,12 @@
+class Token:
+    def __init__(self, type, line, value):
+        self.type = type
+        self.line = line
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"Token(type='{self.type}', line={self.line}, value='{self.value}')"
+
 class Lexer:
     def __init__(self, code):
         self.code = code
@@ -5,12 +14,6 @@ class Lexer:
         self.current_line = 1  # Track the current line number
         self.keywords = {"int", "return", "if", "else", "while", "for", "void", "char", "float", "double", "continue", "break", "send", "recv", "debug"}  # C keywords
         self.tokens = []
-
-    class Token:
-        def __init__(self, type, line, value):
-            self.type = type
-            self.line = line
-            self.value = value
 
     def walk_through_words(self):
         while self.current_position < len(self.code):
@@ -113,7 +116,7 @@ class Lexer:
 
     def tokenize_word(self, word):
         token_type = self.check_token(word)
-        currentToken = self.Token(token_type, self.current_line, word)  # Use current_line instead of current_position
+        currentToken = Token(token_type, self.current_line, word)  # Use current_line instead of current_position
         self.tokens.append(currentToken)
 
     def check_token(self, word):

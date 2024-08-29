@@ -20,9 +20,8 @@ class Parser:
     def __init__(self,tokens: list[Token]):
         self.tokens = tokens
         self.currentPosition = 0
-        pass
 
-    def toAssembly(self)->None:
+    def Compile(self)->None:
         """
         //compilateur
         print(".start")
@@ -38,10 +37,18 @@ class Parser:
         print("dbg\nhalt")
         """
         print(".start")
-        while self.tokens[self.currentPosition].value!="EOF":
-            N = self.AnaSynt()
-            # TODO
+        # while self.tokens[self.currentPosition].value!="EOF":
+        N = self.AnaSynt()
+        self.AnaSem(N)
+        N = self.Optim(N)
+        self.genCode(N)
         print("dbg\nhalt")
+
+    def Optim(self, Node: Node)->Node:
+        return Node
+
+    def AnaSem(self, Node: Node)->None:
+        return None
 
     def incrementTokenPos(self)->None:
         """
@@ -57,46 +64,50 @@ class Parser:
         appelle la bonne fonction pour le token courant
         gros switch
         """
-        # TODO
-        pass
+        return self.f()
     
-    def a(self)->Node:
+    def a(self)->Node|None:
         """
-        voir photo
+        A:= cste | '('E')'
         """
-        if self.checkType("IDENTIFIER"):
-            A = Node("IDENTIFIER",self.tokens[self.currentPosition-1])
+        if self.checkType(["IDENTIFIER"]):
+            A = Node("IDENTIFIER",self.tokens[self.currentPosition-1].value)
             return A
-        elif self.checkValue("("):
-            A = self.e(self)
-            self.acceptValue(")")
+        elif self.checkValue(["("]):
+            A = self.e()
+            self.acceptValue([")"])
             return A
+        elif self.tokens[self.currentPosition].type == "EOF":
+            return None
         else:
-            raise Exception("Atomique token expected")
+            raise Exception(f"Atomic token expected. I got {self.tokens[self.currentPosition]}")
 
     def s(self)->Node:
         return self.a()
 
     def p(self)->Node:
         """
-        voir photo
+        P:= +P | -P | !P | S
         """
-        if self.checkValue("+"):
-            A = Node("PLUS_UNAIRE",self.tokens[self.currentPosition-1])
+        if self.checkValue(["+"]):
+            A = Node("PLUS_UNAIRE",self.tokens[self.currentPosition-1].value)
             A.addChild(self.p())
             return A
-        elif self.checkValue("-"):
-            A = Node("MOINS_UNAIRE",self.tokens[self.currentPosition-1])
+        elif self.checkValue(["-"]):
+            A = Node("MOINS_UNAIRE",self.tokens[self.currentPosition-1].value)
             A.addChild(self.p())
             return A
-        elif self.checkValue("!"):
-            A = Node("NOT",self.tokens[self.currentPosition-1])
+        elif self.checkValue(["!"]):
+            A = Node("NOT",self.tokens[self.currentPosition-1].value)
             A.addChild(self.p())
             return A
         else:
             return self.s()
 
     def e(self)->Node:
+        if self.checkType(["NUMERIC_LITERAL"]): # move to a() ?
+            A = Node("NUMERIC_LITERAL",self.tokens[self.currentPosition-1].value)
+            return A
         return self.p()
 
     def i(self)->Node:
@@ -109,7 +120,9 @@ class Parser:
         """
         voir photo
         """
-        if Node.type=="IDENTIFIER":
+        if Node is None:
+            return None
+        elif Node.type=="NUMERIC_LITERAL": #Const case
             print("push",Node.value)
         elif Node.type=="NOT":
             self.genCode(Node.children[0])
@@ -119,35 +132,35 @@ class Parser:
             self.genCode(Node.children[0])
             print("sub")
         else:
-            Warning("NODE TYPE UNKNOWN -> no assembly transformation")
+            print("NODE TYPE UNKNOWN -> no assembly transformation")
     
 
-    def checkType(self,type)->bool:
-        if (self.tokens[self.currentPosition]!=type):
+    def checkType(self,type: list[str])->bool:
+        if (self.tokens[self.currentPosition].type not in type):
             return False
         else:
             self.currentPosition += 1
             return True
         
 
-    def acceptType(self, type) -> bool:
-        if self.tokens[self.currentPosition] != type:
-            raise Exception(f"Unexpected token type: {self.tokens[self.currentPosition]}\nline {self.tokens[self.currentPosition].line}, token expected: {type}")
+    def acceptType(self, type: list[str]) -> bool:
+        if self.tokens[self.currentPosition].type not in type:
+            raise Exception(f"Unexpected token type: {self.tokens[self.currentPosition].type}\nline {self.tokens[self.currentPosition].line}, token expected: {type}")
         else:
             self.currentPosition += 1
             return True
         
-    def checkValue(self,value)->bool:
-        if (self.tokens[self.currentPosition]!=value):
+    def checkValue(self,value: list[str])->bool:
+        if (self.tokens[self.currentPosition].value not in value):
             return False
         else:
             self.currentPosition += 1
             return True
         
 
-    def acceptValue(self, value) -> bool:
-        if self.tokens[self.currentPosition] != value:
-            raise Exception(f"Unexpected token value: {self.tokens[self.currentPosition]}\nline {self.tokens[self.currentPosition].line}, token expected: {value}")
+    def acceptValue(self, value:list[str]) -> bool:
+        if self.tokens[self.currentPosition].value not in value:
+            raise Exception(f"Unexpected token value: {self.tokens[self.currentPosition].value}\nline {self.tokens[self.currentPosition].line}, token expected: {value}")
         else:
             self.currentPosition += 1
             return True
