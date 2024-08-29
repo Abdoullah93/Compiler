@@ -12,6 +12,9 @@ class Lexer:
             self.line = line
             self.value = value
 
+        def __repr__(self) -> str:
+            return f"Token(type='{self.type}', line={self.line}, value='{self.value}')"
+
     def walk_through_words(self):
         while self.current_position < len(self.code):
             while self.current_position < len(self.code) and self.code[self.current_position].isspace():
@@ -144,7 +147,7 @@ class Lexer:
         # Check if the word is a single or multi-character operator
         if word in ["+", "-", "*", "/", "%", "&&", "||", "&", "|", "^", "~", "!", "=", "==", "!=", "<", ">", "<=", ">="]:
             return "OPERATOR"
-
+        
         # Check if the word is a delimiter
         if word in "{}[]();,":
             return "DELIMITER"
@@ -154,25 +157,21 @@ class Lexer:
 
 
 # # # TESTING
-code = """
-#include <stdio.h>
+# code = """
+# #include <stdio.h>
 
-int main() { 
-    // this is a comment
-    int x1 = 1;
-    int y = 1;
-    if (x1 == 1 && y == 1) {
-        int z = x1 + y;
-    }
-    printf("Hello, world!\n");
-    return 0;
-}
-"""
-lexer = Lexer(code)
-lexer.walk_through_words()
-for token in lexer.tokens: 
-    print('Token: ' + token.value + ', Type: ' + token.type + ', Line: ' + str(token.line))
-
-
-## L=lastToken T=currentToken i= currentPosition  
-## Class TokenType
+# int main() { 
+#     // this is a comment
+#     int x1 = 1;
+#     int y = 1;
+#     if (x1 == 1 && y == 1) {
+#         int z = x1 + y;
+#     }
+#     printf("Hello, world!\n");
+#     return 0;
+# }
+# """
+# lexer = Lexer(code)
+# lexer.walk_through_words()
+# for token in lexer.tokens: 
+#     print('Token: ' + token.value + ', Type: ' + token.type)

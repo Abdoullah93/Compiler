@@ -1,4 +1,4 @@
-#include <stdio.h>
+// #include <stdio.h>
 
 int main() { 
     //this is a comment
@@ -10,7 +10,7 @@ int main() {
     /*
     another comment block
     */
-    
+    printf(y!=1);
     printf("Hello, world!\n");
     return 0;
 }
