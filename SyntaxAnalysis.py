@@ -87,6 +87,7 @@ class Parser:
 
     def p(self)->Node:
         """
+        operateur unaire
         P:= +P | -P | !P | S
         """
         if self.checkValue(["+"]):
@@ -104,11 +105,23 @@ class Parser:
         else:
             return self.s()
 
+    def m(self)->Node:
+        """e pour epsilon
+        M:= E'*'M | M := M(e|'+'E)
+        """
+        pass
+
     def e(self)->Node:
+        """e pour epsilon
+        operateur binaire
+        E:= M(e|'+'E|'-'E)
+        E:=E'*'E|E'/'E|...|P
+        """
         if self.checkType(["NUMERIC_LITERAL"]): # move to a() ?
             A = Node("NUMERIC_LITERAL",self.tokens[self.currentPosition-1].value)
             return A
         return self.p()
+    
 
     def i(self)->Node:
         return self.e()
