@@ -52,6 +52,7 @@ class Data:
             "&&": "nd_AND",
             "||": "nd_OR",
             "=": "nd_ASSIGN",
+            "*": "nd_MUL",
             }
             self.OperationsToAssembly = {
                 # 'Node Type' : 'Assembly code' 
