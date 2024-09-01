@@ -1,4 +1,4 @@
-from lexicalAnalysis import Token
+from Lexer import Token
 
 class Node:
     def __init__(self, type:str, value:str):
@@ -20,6 +20,37 @@ class Parser:
     def __init__(self,tokens: list[Token]):
         self.tokens = tokens
         self.currentPosition = 0
+        self.priority = {
+            '*': {'priority': 7, 'nd_name': "nd_MUL", 'associativity': 1},
+            '/': {'priority': 7, 'nd_name': "nd_DIV", 'associativity': 1},
+            '%': {'priority': 7, 'nd_name': "nd_MOD", 'associativity': 1},
+            '+': {'priority': 6, 'nd_name': "nd_PLUS", 'associativity': 1},
+            '-': {'priority': 6, 'nd_name': "nd_MINUS", 'associativity': 1},
+            '>=': {'priority': 5, 'nd_name': "nd_GTE", 'associativity': 1},
+            '<=': {'priority': 5, 'nd_name': "nd_LTE", 'associativity': 1},
+            '>': {'priority': 5, 'nd_name': "nd_GT", 'associativity': 1},
+            '<': {'priority': 5, 'nd_name': "nd_LT", 'associativity': 1},
+            '==': {'priority': 4, 'nd_name': "nd_EQ", 'associativity': 1},
+            '!=': {'priority': 4, 'nd_name': "nd_NEQ", 'associativity': 1},
+            '&&': {'priority': 3, 'nd_name': "nd_AND", 'associativity': 1},
+            '||': {'priority': 2, 'nd_name': "nd_OR", 'associativity': 1},
+            '=': {'priority': 1, 'nd_name': "nd_ASSIGN", 'associativity': 0}
+        }
+        self.valueToNodeType={
+            "+": "nd_PLUS",
+            "-": "nd_MINUS",
+            "/": "nd_DIV",
+            "%": "nd_MOD",
+            "==": "nd_EQ",
+            "!=": "nd_NEQ",
+            ">=": "nd_GTE",
+            "<=": "nd_LTE",
+            ">": "nd_GT",
+            "<": "nd_LT",
+            "&&": "nd_AND",
+            "||": "nd_OR",
+            "=": "nd_ASSIGN",
+        }
 
     def Compile(self)->None:
         """
@@ -70,8 +101,8 @@ class Parser:
         """
         A:= cste | '('E')'
         """
-        if self.checkType(["IDENTIFIER"]):
-            A = Node("IDENTIFIER",self.tokens[self.currentPosition-1].value)
+        if self.checkType(["NUMERIC_LITERAL"]): # move to a() ?
+            A = Node("NUMERIC_LITERAL",self.tokens[self.currentPosition-1].value)
             return A
         elif self.checkValue(["("]):
             A = self.e()
@@ -109,18 +140,27 @@ class Parser:
         """e pour epsilon
         M:= E'*'M | M := M(e|'+'E)
         """
-        pass
+        return self.p()
 
-    def e(self)->Node:
+    def e(self,prio:int)->Node:
         """e pour epsilon
         operateur binaire
         E:= M(e|'+'E|'-'E)
         E:=E'*'E|E'/'E|...|P
         """
-        if self.checkType(["NUMERIC_LITERAL"]): # move to a() ?
-            A = Node("NUMERIC_LITERAL",self.tokens[self.currentPosition-1].value)
-            return A
-        return self.p()
+        A1 = self.p()
+        while (self.tokens[self.currentPosition].type!="EOF"):
+            op = self.priority.get(self.tokens[self.currentPosition].value)
+            if (op is None or op<prio):
+                return A1
+            self.currentPosition += 1
+            A2 = self.e(op+1)
+            nd_type = self.valueToNodeType.get(op)
+            if (nd_type is None):
+                Exception("nd_type is none")
+            A1 = Node(nd_type)
+            A1.addChild(A1)
+            A1.addChild(A2)
     
 
     def i(self)->Node:
@@ -134,6 +174,7 @@ class Parser:
         voir photo
         """
         if Node is None:
+            print("Node is None")
             return None
         elif Node.type=="NUMERIC_LITERAL": #Const case
             print("push",Node.value)
