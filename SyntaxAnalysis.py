@@ -1,4 +1,8 @@
 from Lexer import Token
+from resources import Data
+
+Data = Data()
+OperationsToAssembly = Data.OperationsToAssembly
 
 class Node:
     def __init__(self, type:str, value:str):
@@ -173,6 +177,11 @@ class Parser:
         """
         voir photo
         """
+        if (Node.type in OperationsToAssembly):
+            for child in Node.children:
+                self.genCode(self,child)
+            print(OperationsToAssembly[Node.type])
+
         if Node is None:
             print("Node is None")
             return None
