@@ -62,5 +62,12 @@ class Data:
                 "nd_MOD": "mod",
                 "nd_MUL" : "mul",
             }
-        
+            self.symbolsToNodeType = {
+                "(": "nd_OPEN_PARENTHESIS",
+                ")": "nd_CLOSE_PARENTHESIS",
+                "{": "nd_OPEN_BRACE",
+                "}": "nd_CLOSE_BRACE",
+                ";": "nd_SEMICOLON",
+                ",": "nd_COMMA",
+            }
 

@@ -149,10 +149,7 @@ class Parser:
     
 
     def i(self)->Node:
-        return self.e()
-
-    def f(self)->Node : 
-        ## TODO there is an issue with choosing  between the types of the token and the node
+         ## TODO there is an issue with choosing  between the types of the token and the node
         if (self.tokens[self.currentPosition].type == 'nd_debug'):	## TODO add this type		# the case of an :'debug' E ';'           
             I =  Node("nd_debug",self.tokens[self.currentPosition].value)
             self.currentPosition += 1
@@ -160,9 +157,9 @@ class Parser:
             I.addChild(E)
         # TODO should be reviwed how to use symboleToNodeType
         #type: ignore # the case of an : '{'  I* '}'
-        if (checkType(self, symboleToNodeType['{'])):        
+        if (self.checkType(symbolsToNodeType['{'])):        
             I = Node("nd_block", None)                       # TODO Node Value is None ?????
-        while(not checkType(symboleToNodeType['}'])):
+        while(not self.checkType(symbolsToNodeType['}'])):
             self.currentPosition += 1
             I.addChild(self.i())
         # else:                        # the case of an : E ';'
@@ -171,6 +168,9 @@ class Parser:
         #     I.addChild(self.e())
 
         return I
+
+    def f(self)->Node : 
+        return self.i()
 
     def genCode(self,Node:Node)->None:
         """
