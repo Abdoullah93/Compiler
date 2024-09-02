@@ -54,7 +54,7 @@ class Data:
             "=": "nd_ASSIGN",
             "*": "nd_MUL",
             }
-            self.nodeTypeToAssembly = {
+            self.OperationsToAssembly = {
                 # 'Node Type' : 'Assembly code' 
                 "nd_PLUS":"add",
                 "nd_MINUS":"sub",
@@ -62,24 +62,5 @@ class Data:
                 "nd_MOD": "mod",
                 "nd_MUL" : "mul",
             }
-            self.symbolToNodeType = {
-            "(": "nd_opened_parenthesis",
-            ")": "nd_closed_parenthesis",
-            "{": "nd_opened_curly_brack",
-            "}": "nd_closed_curly_brack",
-            "[": "nd_opened_bracket",
-            "]": "nd_closed_bracket",
-            ";": "nd_semicolon",
-            ",": "nd_comma",
-            }
-            self.tokenTypeToNodeType = {
-            "NUMERIC_LITERAL": "nd_numeric_literal",
-            "IDENTIFIER": "nd_identifier",
-            "KEYWORD": "nd_keyword",
-            "STRING_LITERAL": "nd_string_literal",  
-            "CHAR_LITERAL": "nd_char_literal",
-            "PREPROCESSOR": "nd_preprocessor",
-            }
-            
         
 
