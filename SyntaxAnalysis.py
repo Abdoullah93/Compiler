@@ -1,21 +1,12 @@
 from Lexer import Token
 from resources import Data
+from resources import Node
+
 
 Data = Data()
 OperationsToAssembly = Data.OperationsToAssembly
+symboleToNodeType = Data.symboleToNodeType
 
-class Node:
-    def __init__(self, type:str, value:str):
-        self.type = type
-        self.value = value
-        self.children = []
-
-    def addChild(self, child:'Node')->None:
-        self.children.append(child)
-
-    def __repr__(self) -> str:
-        return f"Node(type={self.type}, value={self.value}, children={self.children})"
-    
 
 class Parser:
     """
@@ -24,38 +15,7 @@ class Parser:
     def __init__(self,tokens: list[Token]):
         self.tokens = tokens
         self.currentPosition = 0
-        self.priority = {
-            '*': {'priority': 7, 'nd_name': "nd_MUL", 'associativity': 1},
-            '/': {'priority': 7, 'nd_name': "nd_DIV", 'associativity': 1},
-            '%': {'priority': 7, 'nd_name': "nd_MOD", 'associativity': 1},
-            '+': {'priority': 6, 'nd_name': "nd_PLUS", 'associativity': 1},
-            '-': {'priority': 6, 'nd_name': "nd_MINUS", 'associativity': 1},
-            '>=': {'priority': 5, 'nd_name': "nd_GTE", 'associativity': 1},
-            '<=': {'priority': 5, 'nd_name': "nd_LTE", 'associativity': 1},
-            '>': {'priority': 5, 'nd_name': "nd_GT", 'associativity': 1},
-            '<': {'priority': 5, 'nd_name': "nd_LT", 'associativity': 1},
-            '==': {'priority': 4, 'nd_name': "nd_EQ", 'associativity': 1},
-            '!=': {'priority': 4, 'nd_name': "nd_NEQ", 'associativity': 1},
-            '&&': {'priority': 3, 'nd_name': "nd_AND", 'associativity': 1},
-            '||': {'priority': 2, 'nd_name': "nd_OR", 'associativity': 1},
-            '=': {'priority': 1, 'nd_name': "nd_ASSIGN", 'associativity': 0}
-        }
-        self.valueToNodeType={
-            "+": "nd_PLUS",
-            "-": "nd_MINUS",
-            "/": "nd_DIV",
-            "%": "nd_MOD",
-            "==": "nd_EQ",
-            "!=": "nd_NEQ",
-            ">=": "nd_GTE",
-            "<=": "nd_LTE",
-            ">": "nd_GT",
-            "<": "nd_LT",
-            "&&": "nd_AND",
-            "||": "nd_OR",
-            "=": "nd_ASSIGN",
-        }
-
+        
     def Compile(self)->None:
         """
         //compilateur
@@ -168,9 +128,30 @@ class Parser:
     
 
     def i(self)->Node:
+        ## TODO there is an issue with choosing  between the types of the token and the node
+        if (self.tokens[self.currentPosition].type == 'nd_debug')	## TODO add this type		# the case of an :'debug' E ';'
+            I =  Node("nd_debug",self.tokens[self.currentPosition].value)
+            self.currentPosition += 1
+            E = self.e()
+            I.addChild(E)
+        # TODO should be reviwed how to use symboleToNodeType
+        if (checkType(self, symboleToNodeType['{'])) :		# the case of an : '{'  I* '}'
+         	I = Node("nd_block", None)
+        
+        while(not 
+ppppcheckType(symboleToNodeType['}'])):
+     		self.currentPosition += 1
+            I.addChild(self.i())
+        # else:     					# the case of an : E ';'
+        # 	I = Node("drop", )
+        # 	accept(";") # ????
+        # 	I.addChild(self.e())
+
+	    return I
+
         return self.e()
 
-    def f(self)->Node:
+    def f(self)->Node : 
         return self.i()
 
     def genCode(self,Node:Node)->None:
@@ -204,7 +185,6 @@ class Parser:
         else:
             self.currentPosition += 1
             return True
-        
 
     def acceptType(self, type: list[str]) -> bool:
         if self.tokens[self.currentPosition].type not in type:
