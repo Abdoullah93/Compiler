@@ -1,3 +1,5 @@
+#TODO: Factorise le code (token)
+#TODO: add debug token
 class Token:
     def __init__(self, type, line, value):
         self.type = type

@@ -1,8 +1,11 @@
 from Lexer import Token
-from resources import Data
+from resources import Data, Symb, Token
+#TODO: Debugger e(), ajouter le token debug dans lexer, I(), GenCode()
 
 Data = Data()
 OperationsToAssembly = Data.OperationsToAssembly
+valueToNodeType = Data.valueToNodeType
+operationsPriority = Data.operationsPriority
 
 class Node:
     def __init__(self, type:str, value:str):
@@ -24,37 +27,6 @@ class Parser:
     def __init__(self,tokens: list[Token]):
         self.tokens = tokens
         self.currentPosition = 0
-        self.priority = {
-            '*': {'priority': 7, 'nd_name': "nd_MUL", 'associativity': 1},
-            '/': {'priority': 7, 'nd_name': "nd_DIV", 'associativity': 1},
-            '%': {'priority': 7, 'nd_name': "nd_MOD", 'associativity': 1},
-            '+': {'priority': 6, 'nd_name': "nd_PLUS", 'associativity': 1},
-            '-': {'priority': 6, 'nd_name': "nd_MINUS", 'associativity': 1},
-            '>=': {'priority': 5, 'nd_name': "nd_GTE", 'associativity': 1},
-            '<=': {'priority': 5, 'nd_name': "nd_LTE", 'associativity': 1},
-            '>': {'priority': 5, 'nd_name': "nd_GT", 'associativity': 1},
-            '<': {'priority': 5, 'nd_name': "nd_LT", 'associativity': 1},
-            '==': {'priority': 4, 'nd_name': "nd_EQ", 'associativity': 1},
-            '!=': {'priority': 4, 'nd_name': "nd_NEQ", 'associativity': 1},
-            '&&': {'priority': 3, 'nd_name': "nd_AND", 'associativity': 1},
-            '||': {'priority': 2, 'nd_name': "nd_OR", 'associativity': 1},
-            '=': {'priority': 1, 'nd_name': "nd_ASSIGN", 'associativity': 0}
-        }
-        self.valueToNodeType={
-            "+": "nd_PLUS",
-            "-": "nd_MINUS",
-            "/": "nd_DIV",
-            "%": "nd_MOD",
-            "==": "nd_EQ",
-            "!=": "nd_NEQ",
-            ">=": "nd_GTE",
-            "<=": "nd_LTE",
-            ">": "nd_GT",
-            "<": "nd_LT",
-            "&&": "nd_AND",
-            "||": "nd_OR",
-            "=": "nd_ASSIGN",
-        }
 
     def Compile(self)->None:
         """
@@ -74,10 +46,10 @@ class Parser:
         print(".start")
         # while self.tokens[self.currentPosition].value!="EOF":
         N = self.AnaSynt()
-        self.AnaSem(N)
-        N = self.Optim(N)
+        # self.AnaSem(N)
+        # N = self.Optim(N)
         self.genCode(N)
-        print("dbg\nhalt")
+        print("halt")#dbg\n
 
     def Optim(self, Node: Node)->Node:
         return Node
@@ -109,11 +81,11 @@ class Parser:
             A = Node("NUMERIC_LITERAL",self.tokens[self.currentPosition-1].value)
             return A
         elif self.checkValue(["("]):
-            A = self.e()
+            A = self.e(0)
             self.acceptValue([")"])
             return A
-        elif self.tokens[self.currentPosition].type == "EOF":
-            return None
+        # elif self.tokens[self.currentPosition].type == "EOF":
+        #     return None
         else:
             raise Exception(f"Atomic token expected. I got {self.tokens[self.currentPosition]}")
 
@@ -149,26 +121,40 @@ class Parser:
     def e(self,prio:int)->Node:
         """e pour epsilon
         operateur binaire
+        une expression represente une valeur
         E:= M(e|'+'E|'-'E)
         E:=E'*'E|E'/'E|...|P
         """
         A1 = self.p()
         while (self.tokens[self.currentPosition].type!="EOF"):
-            op = self.priority.get(self.tokens[self.currentPosition].value)
+            # print("value used:",self.tokens[self.currentPosition].value)
+            priority = operationsPriority.get(self.tokens[self.currentPosition].value) # priority dict of the current token
+            op = None if priority is None else priority.get("priority") #TODO:DONE Change with Data.operationsPriority 
+            associativity = None if priority is None else priority.get("associativity")
+            nd_type = valueToNodeType.get(self.tokens[self.currentPosition].value)
+            # print("priority :",priority)
+            # print("op: ",op)
             if (op is None or op<prio):
                 return A1
             self.currentPosition += 1
-            A2 = self.e(op+1)
-            nd_type = self.valueToNodeType.get(op)
+            A2 = self.e(op+associativity)
             if (nd_type is None):
-                Exception("nd_type is none")
-            A1 = Node(nd_type)
-            A1.addChild(A1)
-            A1.addChild(A2)
+                raise TypeError("nd_type is none, value: ",self.tokens[self.currentPosition].value)
+            A0 = Node(nd_type,self.tokens[self.currentPosition].value)
+            A0.addChild(A1)
+            A0.addChild(A2)
+            A1 = A0
+        return A1
     
 
     def i(self)->Node:
-        return self.e()
+        """
+        modifie l'environnement (variable local, global, print etc)
+        I:= E';' | 'debug' E';' | '{' I* '}'
+        """
+        # if (self.checkValue(["debug"])):
+        #     1
+        return self.e(0)
 
     def f(self)->Node:
         return self.i()
@@ -177,14 +163,13 @@ class Parser:
         """
         voir photo
         """
+        if Node is None:
+            print("WARNING Node is None")
+            return
         if (Node.type in OperationsToAssembly):
             for child in Node.children:
-                self.genCode(self,child)
+                self.genCode(child)
             print(OperationsToAssembly[Node.type])
-
-        if Node is None:
-            print("Node is None")
-            return None
         elif Node.type=="NUMERIC_LITERAL": #Const case
             print("push",Node.value)
         elif Node.type=="NOT":
@@ -195,7 +180,8 @@ class Parser:
             self.genCode(Node.children[0])
             print("sub")
         else:
-            print("NODE TYPE UNKNOWN -> no assembly transformation")
+            
+            print("NODE TYPE UNKNOWN -> no assembly transformation :",Node)
     
 
     def checkType(self,type: list[str])->bool:
@@ -227,4 +213,17 @@ class Parser:
         else:
             self.currentPosition += 1
             return True
+    
+    #Analyse Semantique
+    def begin() -> None:
+        return
+    
+    def end() -> None:
+        return None
+    
+    def declare(var:str,type:str) -> Symb:
+        pass
+
+    def find(var:str) -> Symb:
+        pass
 
