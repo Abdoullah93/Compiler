@@ -5,7 +5,15 @@ file_path = "test.c"
 with open(file_path, 'r') as file:
 	file_content = file.read()
 # test = "(-(!((3+2))))"
-test = "(3+2)+1+5*6"
+test = "(3+2)+1+5+6"
+test = """
+{
+3+5;
+	{
+	6+2;
+	}
+}
+"""
 
 ### Lexical Analysis ###
 lex = Lexer(test)
