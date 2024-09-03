@@ -154,6 +154,7 @@ class Parser:
             # self.currentPosition += 1
             I.addChild(self.e(0))
             self.acceptValue([";"])
+        print("i(): ",I)
         return I
 
     def f(self)->Node : 
@@ -179,9 +180,9 @@ class Parser:
             print("push 0")
             self.genCode(Node.children[0])
             print("sub")
-        else:
-            
-            print("NODE TYPE UNKNOWN -> no assembly transformation :",Node)
+        # else:
+        #   
+            # print("NODE TYPE UNKNOWN -> no assembly transformation :",Node)
     
 
     def checkType(self,type: list[str])->bool:
