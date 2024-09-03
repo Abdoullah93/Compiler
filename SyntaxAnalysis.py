@@ -37,6 +37,7 @@ class Parser:
         # N = self.Optim(N)
         self.genCode(N)
         print("halt")#dbg\n
+        print(self.tokens[self.currentPosition])
 
     def Optim(self, Node: Node)->Node:
         return Node
@@ -120,8 +121,6 @@ class Parser:
             associativity = None if priority is None else priority.get("associativity")
             nd_type = valueToNodeType.get(self.tokens[self.currentPosition].value)
             tk_value = self.tokens[self.currentPosition].value
-            # print("priority :",priority)
-            # print("op: ",op)
             if (op is None or op<prio):
                 return A1
             self.currentPosition += 1

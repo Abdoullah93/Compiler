@@ -22,8 +22,8 @@ class Token:
 class Data: 
     def __init__(self):
         self.operationsPriority = {
-        'MUL': {'priority': 7, 'nd_name': "nd_MUL", 'associativity': 1},
-        'DIV': {'priority': 7, 'nd_name': "nd_DIV", 'associativity': 1},
+        '*': {'priority': 7, 'nd_name': "nd_MUL", 'associativity': 1},
+        '/': {'priority': 7, 'nd_name': "nd_DIV", 'associativity': 1},
         '%': {'priority': 7, 'nd_name': "nd_MOD", 'associativity': 1},
         '+': {'priority': 6, 'nd_name': "nd_PLUS", 'associativity': 1},
         '-': {'priority': 6, 'nd_name': "nd_MINUS", 'associativity': 1},
