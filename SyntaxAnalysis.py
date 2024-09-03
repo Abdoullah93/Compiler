@@ -6,20 +6,6 @@ operationsPriority = Data.operationsPriority
 valueToNodeType = Data.valueToNodeType
 symbolsToNodeType = Data.symbolsToNodeType
 
-
-class Node:
-    def __init__(self, type:str, value:str):
-        self.type = type
-        self.value = value
-        self.children = []
-
-    def addChild(self, child:'Node')->None:
-        self.children.append(child)
-
-    def __repr__(self) -> str:
-        return f"Node(type={self.type}, value={self.value}, children={self.children})"
-    
-
 class Parser:
     """
     regarde le contexte local
@@ -78,7 +64,7 @@ class Parser:
         """
         A:= cste | '('E')'
         """
-        if self.checkType(["NUMERIC_LITERAL"]): # move to a() ?
+        if self.checkType(["NUMERIC_LITERAL"]): 
             A = Node("NUMERIC_LITERAL",self.tokens[self.currentPosition-1].value)
             return A
         elif self.checkValue(["("]):
@@ -150,24 +136,25 @@ class Parser:
     
 
     def i(self)->Node:
-         ## TODO there is an issue with choosing  between the types of the token and the node
-        if (self.tokens[self.currentPosition].type == 'nd_debug'):	## TODO add this type		# the case of an :'debug' E ';'           
+        ## TODO there is an issue with choosing  between the types of the token and the node
+        # # the case of an :'debug' E ';
+        if (self.tokens[self.currentPosition].value == 'debug'):	## TODO add this type	(Not best practice)	'           
             I =  Node("nd_debug",self.tokens[self.currentPosition].value)
             self.currentPosition += 1
-            E = self.e()
+            E = self.e(0)
             I.addChild(E)
-        # TODO should be reviwed how to use symboleToNodeType
+            self.acceptValue([";"])                         # TODO should be reviwed 
         #type: ignore # the case of an : '{'  I* '}'
-        if (self.checkType(symbolsToNodeType['{'])):        
-            I = Node("nd_block", None)                       # TODO Node Value is None ?????
-        while(not self.checkType(symbolsToNodeType['}'])):
-            self.currentPosition += 1
-            I.addChild(self.i())
-        # else:                        # the case of an : E ';'
-        #     I = Node("drop", )
-        #     accept(";") # ????
-        #     I.addChild(self.e())
-
+        if (self.checkValue(['{'])):        
+            I = Node("nd_block", None)                      # TODO Node Value is None ?????
+            while(not self.checkValue(['}'])):
+                self.currentPosition += 1
+                I.addChild(self.i())
+        else:                        # the case of an : E ';'
+            I = Node("nd_drop", None)   # TODO Node Value is None ?????
+            # self.currentPosition += 1
+            I.addChild(self.e(0))
+            self.acceptValue([";"])
         return I
 
     def f(self)->Node : 
@@ -227,15 +214,15 @@ class Parser:
             return True
     
     #Analyse Semantique
-    def begin() -> None:
-        return
+    # def begin() -> None:
+    #     return
     
-    def end() -> None:
-        return None
+    # def end() -> None:
+    #     return None
     
-    def declare(var:str,type:str) -> Symb:
-        pass
+    # def declare(var:str,type:str) -> Symb:
+    #     pass
 
-    def find(var:str) -> Symb:
-        pass
+    # def find(var:str) -> Symb:
+    #     pass
 
