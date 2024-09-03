@@ -1,9 +1,8 @@
-from resources import Token, Node
-from resources import Data
+from resources import Data, Token, Symb
 
 Data = Data()
-OperationsToAssembly = Data.OperationsToAssembly
-operationsPriority = Data.OperationsPriority 
+OperationsToAssembly = Data.operationsToAssembly
+operationsPriority = Data.operationsPriority
 valueToNodeType = Data.valueToNodeType
 symbolsToNodeType = Data.symbolsToNodeType
 
@@ -33,6 +32,7 @@ class Parser:
         print(".start")
         # while self.tokens[self.currentPosition].value!="EOF":
         N = self.AnaSynt()
+        print(N)
         # self.AnaSem(N)
         # N = self.Optim(N)
         self.genCode(N)
@@ -119,6 +119,7 @@ class Parser:
             op = None if priority is None else priority.get("priority") #TODO:DONE Change with Data.operationsPriority 
             associativity = None if priority is None else priority.get("associativity")
             nd_type = valueToNodeType.get(self.tokens[self.currentPosition].value)
+            tk_value = self.tokens[self.currentPosition].value
             # print("priority :",priority)
             # print("op: ",op)
             if (op is None or op<prio):
@@ -127,7 +128,7 @@ class Parser:
             A2 = self.e(op+associativity)
             if (nd_type is None):
                 raise TypeError("nd_type is none, value: ",self.tokens[self.currentPosition].value)
-            A0 = Node(nd_type,self.tokens[self.currentPosition].value)
+            A0 = Node(nd_type,tk_value)
             A0.addChild(A1)
             A0.addChild(A2)
             A1 = A0
@@ -158,7 +159,7 @@ class Parser:
         return I
 
     def f(self)->Node : 
-        return self.i()
+        return self.e(0)
 
     def genCode(self,Node:Node)->None:
         """
@@ -180,9 +181,9 @@ class Parser:
             print("push 0")
             self.genCode(Node.children[0])
             print("sub")
-        # else:
-        #   
-            # print("NODE TYPE UNKNOWN -> no assembly transformation :",Node)
+        else:
+            
+            print("NODE TYPE UNKNOWN -> no assembly transformation :",Node)
     
 
     def checkType(self,type: list[str])->bool:
