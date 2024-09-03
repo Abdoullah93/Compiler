@@ -1,4 +1,4 @@
-from resources import Data, Token, Symb
+from resources import Data, Token, Symb, Node
 
 Data = Data()
 OperationsToAssembly = Data.operationsToAssembly
