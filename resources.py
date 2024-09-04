@@ -70,7 +70,12 @@ class Data:
             ";": "nd_SEMICOLON",
             ",": "nd_COMMA",
         }
+        self.variableDict = {}
 
 class Symb:
+    def __init__(self, type:str, value:str, line:str):
+        self.type = type # int function
+        self.value = value
+        self.line = line # position
     pass
 

@@ -5,6 +5,7 @@ OperationsToAssembly = Data.operationsToAssembly
 operationsPriority = Data.operationsPriority
 valueToNodeType = Data.valueToNodeType
 symbolsToNodeType = Data.symbolsToNodeType
+variableDict = Data.variableDict
 
 class Parser:
     """
@@ -212,16 +213,16 @@ class Parser:
             self.currentPosition += 1
             return True
     
-    #Analyse Semantique
-    # def begin() -> None:
-    #     return
-    
-    # def end() -> None:
-    #     return None
-    
-    # def declare(var:str,type:str) -> Symb:
-    #     pass
+    # Analyse Semantique
+    def begin() -> None:
 
-    # def find(var:str) -> Symb:
-    #     pass
+        return
+    
+    def end() -> None:
+        return None
+    
+    def declare(var:str,type:str) -> Symb:
+        pass
 
+    def find(var:str) -> Symb:
+        pass
