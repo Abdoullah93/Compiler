@@ -1,16 +1,27 @@
-// #include <stdio.h>
+// This is a test file for the C language
+// Every segment of code separated by the keyword "eof" is a test case
 
-int main() { 
-    //this is a comment
-    int x1 = 1;
-    int y = 1;
-    if (x1==1 && y==1){
-        int z = x1+y;
-    }
-    /*
-    another comment block
-    */
-    printf(y!=1);
-    printf("Hello, world!\n");
-    return 0;
-}
+// Those test involves e() function up to a() function
+(3+2)
+
+eof
+
+(3+2)*5
+
+eof
+
+(3+2)*5/2
+
+eof
+
+(3+2)*5/2+1
+
+eof
+
+(3+2)*5/2+1-3
+
+eof
+
+(3+2)*5/2+1-3*2
+
+// Those test involves i() function up to a() function
